@@ -101,6 +101,18 @@
         continueBtn.disabled = emailInput.value.trim() === "";
     });
 
+    emailInput.addEventListener('blur', () => {
+        const value = emailInput.value.trim();
+
+        if (allowedDomains.test(value)) {
+            emailInput.classList.remove('invalid');
+            emailInput.classList.add('valid');
+        } else {
+            emailInput.classList.remove('valid');
+            emailInput.classList.add('invalid');
+        }
+    });
+
     continueBtn.addEventListener('click', () => {
         const value = emailInput.value.trim();
         const passValue = userPass.value.trim();
