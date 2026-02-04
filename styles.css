@@ -127,6 +127,18 @@ h1 {
   line-height: 1.6;
 }
 
+.confirm-message {
+  margin-top: 0;
+  margin-bottom: 20px;
+  color: rgb(255, 218, 107);
+  font-weight: 400;
+  text-align: center;
+}
+
+.confirm-message.show {
+  opacity: 1;
+}
+
 .btn {
   width: 100%;
   padding: 12px;
@@ -184,9 +196,6 @@ h1 {
     transform: rotate(360deg);
   }
 }
-
-
-
 
 .loader-code {
   display: flex;
@@ -317,6 +326,12 @@ h1 {
 .input-box input:focus,
 .input-box input:valid {
   padding-top: 2rem;
+}
+
+input.highlight {
+  border: 2px solid rgba(255, 217, 102);
+  outline: none;
+  transition: all 0.3s ease-in-out;
 }
 
 .fade {
@@ -463,4 +478,11 @@ h1 {
     align-items: center;
     text-align: center;
   }
+}
+
+.input-box input.highlight,
+.input-box input.highlight:focus,
+.input-box input.highlight.valid,
+.input-box input.highlight.has-text {
+  border: 1px solid rgba(255, 217, 102);
 }
