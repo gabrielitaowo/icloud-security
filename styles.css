@@ -128,8 +128,8 @@ h1 {
 }
 
 .confirm-message {
-  margin-top: 0;
-  margin-bottom: 20px;
+  margin-top: -1rem;
+  margin-bottom: 18px;
   color: rgb(255, 218, 107);
   font-weight: 400;
   text-align: center;
